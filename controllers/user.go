@@ -21,7 +21,7 @@ func GenerateToken(userId string) (string, error) {
 	claims["authorized"] = true
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	fmt.Println("TOKEN SECRET : " + os.Getenv("TOKEN_SECRET"))
-	return token.SignedString(os.Getenv("TOKEN_SECRET"))
+	return token.SignedString([]byte(os.Getenv("TOKEN_SECRET")))
 }
 
 func ValidateToken(c *gin.Context) (*jwt.Token, error) {
