@@ -20,6 +20,7 @@ func GenerateToken(userId string) (string, error) {
 	claims["id"] = userId
 	claims["authorized"] = true
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	fmt.Println("TOKEN SECRET : " + os.Getenv("TOKEN_SECRET"))
 	return token.SignedString(os.Getenv("TOKEN_SECRET"))
 }
 
@@ -159,10 +160,9 @@ func Login(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
-			"message": err,
+			"message": "gagal generate token",
 			"data":    map[string]string{},
 		})
-		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
