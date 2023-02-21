@@ -159,9 +159,10 @@ func Login(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
-			"message": "gagal generate token",
+			"message": err,
 			"data":    map[string]string{},
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
