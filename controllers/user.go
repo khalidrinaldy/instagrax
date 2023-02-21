@@ -9,6 +9,7 @@ import (
 	"instagrax/database"
 	"instagrax/helper"
 	"instagrax/repository"
+	"instagrax/structs"
 	"net/http"
 	"os"
 	"strings"
@@ -28,7 +29,7 @@ func ValidateToken(c *gin.Context) (*jwt.Token, error) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
 			"message": err.Error(),
-			"result":  map[string]string{},
+			"data":    map[string]string{},
 		})
 		return nil, err
 	}
@@ -60,7 +61,7 @@ func ExtractTokenID(c *gin.Context) string {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
 			"message": err.Error(),
-			"result":  map[string]string{},
+			"data":    map[string]string{},
 		})
 		return err.Error()
 	}
@@ -84,7 +85,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "Bad request body",
-			"result":  err,
+			"data":    err,
 		})
 		return
 	}
@@ -93,7 +94,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "invalid email format",
-			"result":  err,
+			"data":    err,
 		})
 		return
 	}
@@ -102,7 +103,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "email or password tidak boleh kosong",
-			"result":  err,
+			"data":    err,
 		})
 		return
 	}
@@ -111,7 +112,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "password minimal 8 karakter",
-			"result":  err,
+			"data":    err,
 		})
 		return
 	}
@@ -121,7 +122,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"code":    http.StatusNotFound,
 			"message": err.Error(),
-			"result":  map[string]string{},
+			"data":    map[string]string{},
 		})
 		return
 	}
@@ -131,7 +132,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
 			"message": "password salah",
-			"result":  map[string]string{},
+			"data":    map[string]string{},
 		})
 		return
 	}
@@ -141,7 +142,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
 			"message": "gagal generate token",
-			"result":  map[string]string{},
+			"data":    map[string]string{},
 		})
 	}
 
@@ -150,6 +151,82 @@ func Login(c *gin.Context) {
 		"message": "login berhasil",
 		"result": map[string]string{
 			"token": token,
+		},
+	})
+}
+
+func Register(c *gin.Context) {
+	var user structs.User
+
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "Bad request body",
+			"data":    err,
+		})
+		return
+	}
+
+	if !helper.IsEmailValid(user.Email) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "invalid email format",
+			"data":    err,
+		})
+		return
+	}
+
+	if strings.TrimSpace(user.Email) == "" || strings.TrimSpace(user.Password) == "" || strings.TrimSpace(user.Username) == "" || strings.TrimSpace(user.Name) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "mohon isi semua field",
+			"data":    err,
+		})
+		return
+	}
+
+	if len(strings.TrimSpace(user.Password)) < 8 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "password minimal 8 karakter",
+			"data":    err,
+		})
+		return
+	}
+
+	_, err = repository.CheckEmail(database.DbConnection, user.Email)
+	if err == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code":    http.StatusNotFound,
+			"message": "email sudah terdaftar",
+			"data":    map[string]string{},
+		})
+		return
+	}
+
+	generatedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	user.Password = string(generatedPassword)
+
+	err = repository.Register(database.DbConnection, user)
+	if err != nil {
+		c.JSON(http.StatusRequestTimeout, gin.H{
+			"code":    http.StatusRequestTimeout,
+			"message": "error in database",
+			"data":    map[string]string{},
+		})
+		return
+	}
+
+	registeredUser, _ := repository.CheckEmail(database.DbConnection, user.Email)
+	generatedToken, err := GenerateToken(registeredUser.Id)
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "register berhasil",
+		"data": map[string]interface{}{
+			"user":  registeredUser,
+			"token": generatedToken,
 		},
 	})
 }
