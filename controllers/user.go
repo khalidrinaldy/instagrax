@@ -157,6 +157,7 @@ func Login(c *gin.Context) {
 	}
 
 	token, err := GenerateToken(user.Id)
+	fmt.Printf("GENERATED TOKEN : %s\n", token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
