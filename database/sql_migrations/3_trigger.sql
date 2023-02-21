@@ -12,7 +12,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER set_timestamp_category
-    BEFORE UPDATE ON user
+    BEFORE UPDATE ON users
     FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
 
