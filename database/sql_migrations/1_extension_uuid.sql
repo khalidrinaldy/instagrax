@@ -1,6 +1,6 @@
 -- +migrate Up
 -- +migrate StatementBegin
 
-CREATE EXTENSION IF NOT EXISTS 'uuid-ossp';
+CREATE EXTENSION "uuid-ossp";
 
 -- +migrate StatementEnd
