@@ -1,7 +1,7 @@
 -- +migrate Up
 -- +migrate StatementBegin
 
-create table user (
+create table users (
     id uuid default uuid_generate_v4(),
     username varchar(25) not null unique,
     name varchar(256) not null,

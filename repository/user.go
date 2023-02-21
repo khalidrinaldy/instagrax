@@ -7,7 +7,7 @@ import (
 )
 
 func GetAllUsers(db *sql.DB) (users []structs.User, err error) {
-	sql := "select * from user"
+	sql := "select * from users"
 	rows, err := db.Query(sql)
 	if err != nil {
 		panic(err)
@@ -27,7 +27,7 @@ func GetAllUsers(db *sql.DB) (users []structs.User, err error) {
 
 func CheckEmail(db *sql.DB, email string) (user structs.User, err error) {
 	var users []structs.User
-	sql := "select * from user where email=$1"
+	sql := "select * from users where email=$1"
 	rows, err := db.Query(sql, email)
 	if err != nil {
 		panic(err)
@@ -52,7 +52,7 @@ func CheckEmail(db *sql.DB, email string) (user structs.User, err error) {
 
 func CheckUsername(db *sql.DB, username string) (user structs.User, err error) {
 	var users []structs.User
-	sql := "select * from user where username=$1"
+	sql := "select * from users where username=$1"
 	rows, err := db.Query(sql, username)
 	if err != nil {
 		panic(err)
@@ -77,7 +77,7 @@ func CheckUsername(db *sql.DB, username string) (user structs.User, err error) {
 
 func CheckId(db *sql.DB, id string) (user structs.User, err error) {
 	var users []structs.User
-	sql := "select * from user where id=$1"
+	sql := "select * from users where id=$1"
 	rows, err := db.Query(sql, id)
 	if err != nil {
 		panic(err)
@@ -101,13 +101,13 @@ func CheckId(db *sql.DB, id string) (user structs.User, err error) {
 }
 
 func Register(db *sql.DB, user structs.User) error {
-	sql := "insert into user (username, name, email, password) values ($1,$2,$3,$4)"
+	sql := "insert into users (username, name, email, password) values ($1,$2,$3,$4)"
 	errs := db.QueryRow(sql, user.Username, user.Name, user.Email, user.Password)
 	return errs.Err()
 }
 
 func EditProfile(db *sql.DB, user structs.User) error {
-	sql := "update user set username=$1, name=$2 where id=$3"
+	sql := "update users set username=$1, name=$2 where id=$3"
 	errs := db.QueryRow(sql, user.Username, user.Name, user.Id)
 	return errs.Err()
 }
