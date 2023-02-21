@@ -74,6 +74,24 @@ func ExtractTokenID(c *gin.Context) string {
 	return ""
 }
 
+func GetAllUsers(c *gin.Context) {
+	users, err := repository.GetAllUsers(database.DbConnection)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "error",
+			"data":    err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "get users success",
+		"data":    users,
+	})
+}
+
 func Login(c *gin.Context) {
 	request := struct {
 		Email    string `json:"email" binding:"required"`
@@ -205,6 +223,16 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	_, err = repository.CheckUsername(database.DbConnection, user.Username)
+	if err == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code":    http.StatusNotFound,
+			"message": "username sudah terdaftar",
+			"data":    map[string]string{},
+		})
+		return
+	}
+
 	generatedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	user.Password = string(generatedPassword)
 
@@ -228,5 +256,66 @@ func Register(c *gin.Context) {
 			"user":  registeredUser,
 			"token": generatedToken,
 		},
+	})
+}
+
+func EditProfile(c *gin.Context) {
+	var requestUser structs.User
+
+	err := c.ShouldBindJSON(&requestUser)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "Bad request body",
+			"data":    err,
+		})
+		return
+	}
+
+	if strings.TrimSpace(requestUser.Username) == "" || strings.TrimSpace(requestUser.Name) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "mohon isi semua field",
+			"data":    err,
+		})
+		return
+	}
+
+	id := ExtractTokenID(c)
+	requestUser.Id = id
+	_, err = repository.CheckId(database.DbConnection, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code":    http.StatusNotFound,
+			"message": err.Error(),
+			"data":    map[string]string{},
+		})
+		return
+	}
+
+	_, err = repository.CheckUsername(database.DbConnection, requestUser.Username)
+	if err == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code":    http.StatusNotFound,
+			"message": "username sudah terdaftar",
+			"data":    map[string]string{},
+		})
+		return
+	}
+
+	err = repository.EditProfile(database.DbConnection, requestUser)
+	if err != nil {
+		c.JSON(http.StatusRequestTimeout, gin.H{
+			"code":    http.StatusRequestTimeout,
+			"message": "error in database",
+			"data":    map[string]string{},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "edit profile berhasil",
+		"data":    map[string]interface{}{},
 	})
 }
