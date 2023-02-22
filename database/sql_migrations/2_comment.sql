@@ -1,7 +1,7 @@
 -- +migrate Up
 -- +migrate StatementBegin
 
-create table like (
+create table comment (
     id uuid default uuid_generate_v4(),
     text text not null,
     user_id uuid not null,
