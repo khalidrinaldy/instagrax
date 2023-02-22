@@ -14,6 +14,7 @@ func GetUsersAllPosts(db *sql.DB, user_id string) (posts []structs.PostToShow, e
 		panic(err)
 	}
 	defer rows.Close()
+	fmt.Println("ROWS")
 	fmt.Println(rows)
 
 	for rows.Next() {
@@ -23,6 +24,7 @@ func GetUsersAllPosts(db *sql.DB, user_id string) (posts []structs.PostToShow, e
 			panic(err)
 		}
 		posts = append(posts, post)
+		fmt.Println("POST")
 		fmt.Println(post)
 	}
 
