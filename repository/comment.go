@@ -6,7 +6,7 @@ import (
 )
 
 func GetAllComment(db *sql.DB, id string) (comments []structs.Comment, err error) {
-	sql := "select * from comment where post_id=$1"
+	sql := "select * from comments where post_id=$1"
 	rows, err := db.Query(sql, id)
 	if err != nil {
 		panic(err)
