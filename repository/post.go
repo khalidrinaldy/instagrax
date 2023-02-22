@@ -6,9 +6,9 @@ import (
 	"instagrax/structs"
 )
 
-func GetUsersAllPosts(db *sql.DB, user_id string) (posts []structs.PostToShow, err error) {
-	sqlPosts := `select * from post`
-	rowsPosts, err := db.Query(sqlPosts, user_id)
+func GetUsersAllPosts(db *sql.DB, userId string) (posts []structs.PostToShow, err error) {
+	sqlPosts := `select * from post where user_id=$1`
+	rowsPosts, err := db.Query(sqlPosts, userId)
 	if err != nil {
 		panic(err)
 	}
