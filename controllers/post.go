@@ -180,22 +180,6 @@ func Like(c *gin.Context) {
 
 	isLiked := repository.IsLiked(database.DbConnection, userId)
 	if isLiked {
-		err = repository.AddLike(database.DbConnection, like)
-		if err != nil {
-			c.JSON(http.StatusRequestTimeout, gin.H{
-				"code":    http.StatusRequestTimeout,
-				"message": "error in database",
-				"data":    map[string]string{},
-			})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"message": "like post berhasil",
-			"data":    map[string]interface{}{},
-		})
-	} else {
 		err = repository.DeleteLike(database.DbConnection, id)
 		if err != nil {
 			c.JSON(http.StatusRequestTimeout, gin.H{
@@ -209,6 +193,22 @@ func Like(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"code":    http.StatusOK,
 			"message": "unlike post berhasil",
+			"data":    map[string]interface{}{},
+		})
+	} else {
+		err = repository.AddLike(database.DbConnection, like)
+		if err != nil {
+			c.JSON(http.StatusRequestTimeout, gin.H{
+				"code":    http.StatusRequestTimeout,
+				"message": "error in database",
+				"data":    map[string]string{},
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "like post berhasil",
 			"data":    map[string]interface{}{},
 		})
 	}
