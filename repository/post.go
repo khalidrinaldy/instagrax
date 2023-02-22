@@ -15,7 +15,7 @@ func GetUsersAllPosts(db *sql.DB, user_id string) (posts []structs.PostToShow, e
 	}
 	defer rows.Close()
 	fmt.Println("ROWS")
-	fmt.Println(rows)
+	fmt.Println(*rows)
 
 	for rows.Next() {
 		var post structs.PostToShow
