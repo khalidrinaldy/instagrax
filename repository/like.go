@@ -20,7 +20,7 @@ func IsLiked(db *sql.DB, like structs.Like) (structs.Like, bool) {
 	var returnedLike structs.Like
 	sql = "select * from likes where user_id=$1 and post_id=$2 "
 	row = db.QueryRow(sql, like.UserId, like.PostId)
-	row.Scan(&returnedLike)
+	row.Scan(&returnedLike.Id, &returnedLike.UserId, &returnedLike.PostId, &returnedLike.UpdatedAt, &returnedLike.CreatedAt)
 	return returnedLike, amount >= 1
 }
 
