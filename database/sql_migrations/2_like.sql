@@ -1,7 +1,7 @@
 -- +migrate Up
 -- +migrate StatementBegin
 
-create table like (
+create table likes (
     id uuid default uuid_generate_v4(),
     user_id uuid not null,
     post_id uuid not null,
