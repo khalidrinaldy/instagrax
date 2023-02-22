@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"instagrax/structs"
 )
 
@@ -9,6 +10,7 @@ func GetUsersAllPosts(db *sql.DB, user_id string) (posts []structs.PostToShow, e
 	sql := `select p.id, p.image_url, p.caption, p.user_id, count(l.post_id) as likes, count(c.post_id) as comments, p.created_at, p.updated_at 
 			from post p inner join likes l on p.id = l.post_id inner join comments c on p.id = c.post_id where p.user_id=$1 group by p.id`
 	rows, err := db.Query(sql, user_id)
+	fmt.Println(rows)
 	if err != nil {
 		panic(err)
 	}
@@ -21,6 +23,7 @@ func GetUsersAllPosts(db *sql.DB, user_id string) (posts []structs.PostToShow, e
 			panic(err)
 		}
 		posts = append(posts, post)
+		fmt.Println(post)
 	}
 
 	return
