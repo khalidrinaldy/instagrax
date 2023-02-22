@@ -214,22 +214,24 @@ func Like(c *gin.Context) {
 	}
 }
 
-//func DeleteLike(c *gin.Context) {
-//	id := c.Param("id")
-//
-//	userId := ExtractTokenID(c)
-//	_, err := repository.CheckId(database.DbConnection, userId)
-//	if err != nil {
-//		c.JSON(http.StatusNotFound, gin.H{
-//			"code":    http.StatusNotFound,
-//			"message": err.Error(),
-//			"data":    map[string]string{},
-//		})
-//		return
-//	}
-//
-//
-//}
+func GetAllComment(c *gin.Context) {
+	id := c.Param("id")
+	comments, err := repository.GetAllComment(database.DbConnection, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "err",
+			"data":    err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "get all post by user id",
+		"data":    comments,
+	})
+}
 
 func AddComment(c *gin.Context) {
 	var comment structs.Comment

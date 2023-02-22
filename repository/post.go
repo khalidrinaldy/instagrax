@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 	"instagrax/structs"
 )
 
@@ -30,8 +29,6 @@ func GetUsersAllPosts(db *sql.DB, userId string) (posts []structs.PostToShow, er
 		rowComment.Scan(&post.Comments)
 
 		posts = append(posts, post)
-		fmt.Println("POST")
-		fmt.Println(post)
 	}
 
 	return
