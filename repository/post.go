@@ -7,22 +7,28 @@ import (
 )
 
 func GetUsersAllPosts(db *sql.DB, user_id string) (posts []structs.PostToShow, err error) {
-	sql := `select p.id, p.image_url, p.caption, p.user_id, count(l.post_id) as likes, count(c.post_id) as comments, p.created_at, p.updated_at 
-			from post p inner join likes l on p.id = l.post_id inner join comments c on p.id = c.post_id where p.user_id=$1 group by p.id`
-	rows, err := db.Query(sql, user_id)
+	sqlPosts := `select * from post`
+	rowsPosts, err := db.Query(sqlPosts, user_id)
 	if err != nil {
 		panic(err)
 	}
-	defer rows.Close()
-	fmt.Println("ROWS")
-	fmt.Println(*rows)
+	defer rowsPosts.Close()
 
-	for rows.Next() {
+	for rowsPosts.Next() {
 		var post structs.PostToShow
-		err = rows.Scan(&post.Id, &post.ImageUrl, &post.Caption, &post.UserId, &post.Likes, &post.Comments, &post.CreatedAt, &post.UpdatedAt)
+		err = rowsPosts.Scan(&post.Id, &post.ImageUrl, &post.Caption, &post.UserId, &post.CreatedAt, &post.UpdatedAt)
 		if err != nil {
 			panic(err)
 		}
+
+		sqlLikes := "select count(*) from likes where post_id=$1"
+		rowLike := db.QueryRow(sqlLikes, post.Id)
+		rowLike.Scan(&post.Likes)
+
+		sqlComments := "select count(*) from comments where post_id=$1"
+		rowComment := db.QueryRow(sqlComments, post.Id)
+		rowComment.Scan(&post.Comments)
+
 		posts = append(posts, post)
 		fmt.Println("POST")
 		fmt.Println(post)
