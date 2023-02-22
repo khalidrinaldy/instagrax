@@ -21,6 +21,7 @@ func GetAllComment(db *sql.DB, id string) (comments []structs.Comment, err error
 		}
 		comments = append(comments, comment)
 	}
+
 	return
 }
 
