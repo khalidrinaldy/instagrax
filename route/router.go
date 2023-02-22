@@ -24,7 +24,7 @@ func StartServer() *gin.Engine {
 
 	protected.POST("/posts/like/:id", controllers.Like)
 
-	protected.POST("/posts/comment/:id", controllers.GetAllComment)
+	protected.GET("/posts/comment/:id", controllers.GetAllComment)
 	protected.POST("/posts/comment/:id", controllers.AddComment)
 	protected.DELETE("/posts/comment/:id", controllers.DeleteComment)
 	return router
