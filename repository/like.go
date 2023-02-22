@@ -11,12 +11,17 @@ func AddLike(db *sql.DB, like structs.Like) error {
 	return err.Err()
 }
 
-func IsLiked(db *sql.DB, userId string) bool {
+func IsLiked(db *sql.DB, like structs.Like) (structs.Like, bool) {
 	var amount int
-	sql := "select count(*) from likes where user_id=$1"
-	row := db.QueryRow(sql, userId)
+	sql := "select count(*) from likes where user_id=$1 and post_id=$2"
+	row := db.QueryRow(sql, like.UserId, like.PostId)
 	row.Scan(&amount)
-	return amount >= 1
+
+	var returnedLike structs.Like
+	sql = "select * from likes where user_id=$1 and post_id=$2 "
+	row = db.QueryRow(sql, like.UserId, like.PostId)
+	row.Scan(&returnedLike)
+	return returnedLike, amount >= 1
 }
 
 func DeleteLike(db *sql.DB, id string) error {

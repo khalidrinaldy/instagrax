@@ -178,9 +178,9 @@ func Like(c *gin.Context) {
 		return
 	}
 
-	isLiked := repository.IsLiked(database.DbConnection, userId)
+	returnedLike, isLiked := repository.IsLiked(database.DbConnection, like)
 	if isLiked {
-		err = repository.DeleteLike(database.DbConnection, id)
+		err = repository.DeleteLike(database.DbConnection, returnedLike.Id)
 		if err != nil {
 			c.JSON(http.StatusRequestTimeout, gin.H{
 				"code":    http.StatusRequestTimeout,
