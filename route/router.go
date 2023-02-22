@@ -17,15 +17,15 @@ func StartServer() *gin.Engine {
 	protected.Use(middlewares.JWTMiddleware())
 	protected.PUT("/users/edit", controllers.EditProfile)
 
-	protected.GET("/users/:id/posts", controllers.GetUsersAllPosts)
-	protected.POST("/users/posts", controllers.CreatePost)
-	protected.PUT("/users/posts/:id", controllers.EditPost)
-	protected.DELETE("/users/posts/:id", controllers.DeletePost)
+	protected.GET("/users/posts/:id", controllers.GetUsersAllPosts)
+	protected.POST("/posts", controllers.CreatePost)
+	protected.PUT("/posts/:id", controllers.EditPost)
+	protected.DELETE("/posts/:id", controllers.DeletePost)
 
-	protected.POST("/users/posts/like/:id", controllers.AddLike)
-	protected.DELETE("/users/posts/like/:id", controllers.DeleteLike)
+	protected.POST("/posts/like/:id", controllers.AddLike)
+	protected.DELETE("/posts/like/:id", controllers.DeleteLike)
 
-	protected.POST("/users/posts/comment/:id", controllers.AddComment)
-	protected.DELETE("/users/posts/comment/:id", controllers.DeleteComment)
+	protected.POST("/posts/comment/:id", controllers.AddComment)
+	protected.DELETE("/posts/comment/:id", controllers.DeleteComment)
 	return router
 }
