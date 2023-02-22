@@ -161,7 +161,7 @@ func DeletePost(c *gin.Context) {
 	})
 }
 
-func AddLike(c *gin.Context) {
+func Like(c *gin.Context) {
 	var like structs.Like
 	id := c.Param("id")
 	like.PostId = id
@@ -178,53 +178,58 @@ func AddLike(c *gin.Context) {
 		return
 	}
 
-	err = repository.AddLike(database.DbConnection, like)
-	if err != nil {
-		c.JSON(http.StatusRequestTimeout, gin.H{
-			"code":    http.StatusRequestTimeout,
-			"message": "error in database",
-			"data":    map[string]string{},
-		})
-		return
-	}
+	isLiked := repository.IsLiked(database.DbConnection, userId)
+	if isLiked {
+		err = repository.AddLike(database.DbConnection, like)
+		if err != nil {
+			c.JSON(http.StatusRequestTimeout, gin.H{
+				"code":    http.StatusRequestTimeout,
+				"message": "error in database",
+				"data":    map[string]string{},
+			})
+			return
+		}
 
-	c.JSON(http.StatusOK, gin.H{
-		"code":    http.StatusOK,
-		"message": "like post berhasil",
-		"data":    map[string]interface{}{},
-	})
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "like post berhasil",
+			"data":    map[string]interface{}{},
+		})
+	} else {
+		err = repository.DeleteLike(database.DbConnection, id)
+		if err != nil {
+			c.JSON(http.StatusRequestTimeout, gin.H{
+				"code":    http.StatusRequestTimeout,
+				"message": "error in database",
+				"data":    map[string]string{},
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "unlike post berhasil",
+			"data":    map[string]interface{}{},
+		})
+	}
 }
 
-func DeleteLike(c *gin.Context) {
-	id := c.Param("id")
-
-	userId := ExtractTokenID(c)
-	_, err := repository.CheckId(database.DbConnection, userId)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"code":    http.StatusNotFound,
-			"message": err.Error(),
-			"data":    map[string]string{},
-		})
-		return
-	}
-
-	err = repository.DeleteLike(database.DbConnection, id)
-	if err != nil {
-		c.JSON(http.StatusRequestTimeout, gin.H{
-			"code":    http.StatusRequestTimeout,
-			"message": "error in database",
-			"data":    map[string]string{},
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"code":    http.StatusOK,
-		"message": "unlike post berhasil",
-		"data":    map[string]interface{}{},
-	})
-}
+//func DeleteLike(c *gin.Context) {
+//	id := c.Param("id")
+//
+//	userId := ExtractTokenID(c)
+//	_, err := repository.CheckId(database.DbConnection, userId)
+//	if err != nil {
+//		c.JSON(http.StatusNotFound, gin.H{
+//			"code":    http.StatusNotFound,
+//			"message": err.Error(),
+//			"data":    map[string]string{},
+//		})
+//		return
+//	}
+//
+//
+//}
 
 func AddComment(c *gin.Context) {
 	var comment structs.Comment

@@ -22,8 +22,7 @@ func StartServer() *gin.Engine {
 	protected.PUT("/posts/:id", controllers.EditPost)
 	protected.DELETE("/posts/:id", controllers.DeletePost)
 
-	protected.POST("/posts/like/:id", controllers.AddLike)
-	protected.DELETE("/posts/like/:id", controllers.DeleteLike)
+	protected.POST("/posts/like/:id", controllers.Like)
 
 	protected.POST("/posts/comment/:id", controllers.AddComment)
 	protected.DELETE("/posts/comment/:id", controllers.DeleteComment)
